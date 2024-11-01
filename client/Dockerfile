@@ -8,6 +8,8 @@ WORKDIR /app
 # Cache and Install dependencies
 COPY package.json .
 COPY yarn.lock .
+COPY postcss.config.cjs .
+COPY tailwind.config.js .
 RUN yarn
 
 # Copy app files

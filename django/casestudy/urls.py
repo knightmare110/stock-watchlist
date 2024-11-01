@@ -18,7 +18,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from casestudy.views import SignupView, LoginView
+from casestudy.views import SignupView, LoginView, StockSearchView, CheckAuthView
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -32,5 +32,7 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     path('signup/', SignupView.as_view(), name='signup'),
-    path('login/', LoginView.as_view(), name='login')
+    path('login/', LoginView.as_view(), name='login'),
+    path("api/stocks/", StockSearchView.as_view(), name="stock-search"),
+    path("api/auth/check/", CheckAuthView.as_view(), name="check-auth"),
 ]
