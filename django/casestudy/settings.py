@@ -66,6 +66,17 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_METHODS = [
+    "GET",
+    "POST",
+    "OPTIONS",
+    "PUT",
+    "PATCH",
+    "DELETE",
+]
+
 ROOT_URLCONF = 'casestudy.urls'
 
 TEMPLATES = [
@@ -150,3 +161,5 @@ CACHES = {
         "LOCATION": "redis://redis:6379",
     }
 }
+
+ALBERT_CASE_STUDY_API_KEY = "d2db5753-33f6-4e25-b915-6cbdda7953e7"

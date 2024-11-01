@@ -1,31 +1,18 @@
-import './App.css';
-import { LoginForm } from './LoginForm';
-import { UserContext } from './UserContext';
-import { useState, useCallback, useMemo } from 'react';
-import { User } from "./User.jsx";
-
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import DashboardPage from "./pages/Dashboard";
 
 function App() {
-  const [user, setUser] = useState(null);
-  const login = useCallback((u) => setUser(u), []);
-  const logout = useCallback(() => setUser(null), []);
-  const value = useMemo(() => ({ user, login, logout }), [user, login, logout]);
-
   return (
-    <UserContext.Provider value={value}>
-      <div className="app">
-        <LoginForm />
-        <header>
-          <h1>Albert stock watch</h1>
-          <User />
-        </header>
-        {user && (
-          <section>
-            Your content goes here
-          </section>
-        )}
-      </div>
-    </UserContext.Provider>
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+      </Routes>
+    </Router>
   );
 }
 
