@@ -1,0 +1,113 @@
+# Global ignores
+
+# macOS
+.DS_Store
+
+# Logs
+logs/
+*.log
+*.out
+*.log.*
+
+# Environment variables
+.env
+*.env
+.secret/
+*.secret
+
+# Python related
+*.py[cod]
+__pycache__/
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+pip-log.txt
+# Python virtual environments
+venv/
+ENV/
+.venv/
+ENV.bak/
+venv.bak/
+
+# Django specific files
+django/db.sqlite3
+django/media/
+django/staticfiles/
+**/migrations/
+
+# Node.js specific
+client/node_modules/
+client/npm-debug.log*
+client/yarn-debug.log*
+client/yarn-error.log*
+client/.pnpm-debug.log*
+client/package-lock.json
+client/yarn.lock
+client/.pnp.*
+client/.pnp.js
+
+# Docker
+*.container
+.dockerignore
+docker-compose*.yml
+
+# IDE and Text Editor Configs
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Type Checking and Coverage Reports
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+.tox/
+nosetests.xml
+.coverage
+.cache/
+.pytest_cache/
+
+# Redis and PostgreSQL
+*.rdb
+*.aof
+pg_data/
+*.pgdata
+*.psql
+
+# Frontend build output
+client/dist/
+client/build/
+client/.next/
+client/.nuxt/
+client/.out/
+client/public/
+client/cache/
+client/.cache/
+
+# Design files
+*.png
+*.jpg
+*.jpeg
+*.svg
+*.gif
+*.pdf
+*.eps
+*.psd
+*.ai
+*.xd
+*.fig
+
+# Miscellaneous
+*.iml
+*.gradle
