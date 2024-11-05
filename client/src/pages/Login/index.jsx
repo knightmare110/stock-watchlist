@@ -14,10 +14,11 @@ const LoginPage = () => {
         username,
         password,
       });
-      const { access } = response.data;
+      const { access, username: returnedUsername } = response.data;
 
       // Store token in localStorage
       localStorage.setItem("token", access);
+      localStorage.setItem("username", returnedUsername);
 
       // Redirect to dashboard
       navigate("/dashboard");

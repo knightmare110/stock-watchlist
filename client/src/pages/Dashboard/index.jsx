@@ -9,8 +9,7 @@ const DashboardPage = () => {
   const [filteredStockData, setFilteredStockData] = useState([]);
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
-  
-  // Function to check user authentication from API
+
   const checkAuth = async () => {
     try {
       const response = await axios.get("http://localhost:8000/api/auth/check/", {
@@ -19,17 +18,16 @@ const DashboardPage = () => {
         },
         withCredentials: true,
       });
-      
+
       if (response.status !== 200) {
-        navigate("/login"); // Redirect to login if not authenticated
+        navigate("/login");
       }
     } catch (error) {
       console.error("User not authenticated:", error);
-      navigate("/login"); // Redirect to login on error
+      navigate("/login");
     }
   };
 
-  // Fetch stock data if authenticated
   const fetchStockData = async () => {
     try {
       const response = await axios.get("http://localhost:8000/api/stocks/", {
@@ -45,12 +43,10 @@ const DashboardPage = () => {
     }
   };
 
-  // On component mount, check authentication, then fetch stock data
   useEffect(() => {
     checkAuth().then(() => fetchStockData());
   }, []);
 
-  // Update filtered data when search query changes
   useEffect(() => {
     const filteredData = Object.entries(allStockData).filter(([ticker, name]) =>
       ticker.includes(searchQuery.toUpperCase()) ||
@@ -58,6 +54,24 @@ const DashboardPage = () => {
     );
     setFilteredStockData(filteredData);
   }, [searchQuery, allStockData]);
+
+  const addToWatchlist = async (ticker, name) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/watchlist/",
+        { ticker, name },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      );
+      alert(response.data.message);
+    } catch (error) {
+      console.error("Error adding to watchlist:", error);
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -76,6 +90,7 @@ const DashboardPage = () => {
           <tr>
             <th className="py-2 px-4 border-b">Ticker</th>
             <th className="py-2 px-4 border-b">Name</th>
+            <th className="py-2 px-4 border-b">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -84,11 +99,19 @@ const DashboardPage = () => {
               <tr key={ticker}>
                 <td className="py-2 px-4 border-b">{ticker}</td>
                 <td className="py-2 px-4 border-b">{name}</td>
+                <td className="py-2 px-4 border-b">
+                  <button
+                    onClick={() => addToWatchlist(ticker, name)}
+                    className="bg-blue-500 text-white px-4 py-2 rounded"
+                  >
+                    Add to Watchlist
+                  </button>
+                </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="2" className="py-4 text-center">
+              <td colSpan="3" className="py-4 text-center">
                 No data available
               </td>
             </tr>
