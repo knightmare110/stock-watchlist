@@ -174,4 +174,7 @@ CELERY_BEAT_SCHEDULE = {                         # Define the schedule here
         'task': 'core.celery.update_stock_prices',  # Full path to the Celery task
         'schedule': 5.0,  # Run every 5 seconds
     },
-}
+},
+
+WEBSOCKET_URL = 'ws://0.0.0.0:8001'
+ASGI_APPLICATION = 'django_app.asgi.application'
