@@ -1,0 +1,11 @@
+version = 0.1
+[default.pipeline_bootstrap.parameters]
+pipeline_user = "arn:aws:iam::211125606024:user/aws-sam-cli-managed-kt-albert-stock-no-PipelineUser-pddgtdlzPLzD"
+permissions_provider = "AWS IAM"
+
+[kt-albert-stock-notification-app-stage1.pipeline_bootstrap.parameters]
+pipeline_execution_role = "arn:aws:iam::211125606024:role/aws-sam-cli-managed-kt-albert-PipelineExecutionRole-AAGPC05VD7dh"
+cloudformation_execution_role = "arn:aws:iam::211125606024:role/aws-sam-cli-managed-kt-al-CloudFormationExecutionRo-NObnuWzHfRsf"
+artifacts_bucket = "aws-sam-cli-managed-kt-albert-stoc-artifactsbucket-fvcoxkq9wd9g"
+image_repository = ""
+region = "us-east-1"
