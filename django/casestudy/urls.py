@@ -18,7 +18,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from casestudy.views import SignupView, LoginView, StockSearchView, CheckAuthView
+from casestudy.views import SignupView, LoginView, StockSearchView, CheckAuthView, AddToWatchlistView
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -35,4 +35,6 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path("api/stocks/", StockSearchView.as_view(), name="stock-search"),
     path("api/auth/check/", CheckAuthView.as_view(), name="check-auth"),
+    path('api/watchlist/', AddToWatchlistView.as_view(), name='add-to-watchlist'),
+    path('api/watchlist/<str:username>/', AddToWatchlistView.as_view(), name='user-watchlist'),  # New URL pattern for user-specific watchlist
 ]

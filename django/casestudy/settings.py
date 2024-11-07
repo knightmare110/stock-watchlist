@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'casestudy',
+    'core',
+    'django_celery_beat'
 ]
 
 REST_FRAMEWORK = {
@@ -163,3 +165,16 @@ CACHES = {
 }
 
 ALBERT_CASE_STUDY_API_KEY = "d2db5753-33f6-4e25-b915-6cbdda7953e7"
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+SNS_TOPIC_ARN = "KT_ALBERT_STOCK"
+
+CELERY_BEAT_SCHEDULE = {                         # Define the schedule here
+    'update-stock-prices-every-5-seconds': {
+        'task': 'core.celery.update_stock_prices',  # Full path to the Celery task
+        'schedule': 5.0,  # Run every 5 seconds
+    },
+},
+
+WEBSOCKET_URL = 'ws://0.0.0.0:8001'
+ASGI_APPLICATION = 'django_app.asgi.application'

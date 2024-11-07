@@ -1,6 +1,9 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const DashboardLayout = ({ children }) => {
+  const navigate = useNavigate();
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
@@ -10,20 +13,17 @@ const DashboardLayout = ({ children }) => {
         </div>
         <nav className="mt-4">
           <ul>
-            <li className="py-2 px-6 hover:bg-gray-200 cursor-pointer">
-              Dashboard
+            <li
+              className="py-2 px-6 hover:bg-gray-200 cursor-pointer"
+              onClick={() => navigate("/dashboard")}
+            >
+              Home
             </li>
-            <li className="py-2 px-6 hover:bg-gray-200 cursor-pointer">
-              Profile
-            </li>
-            <li className="py-2 px-6 hover:bg-gray-200 cursor-pointer">
-              Settings
-            </li>
-            <li className="py-2 px-6 hover:bg-gray-200 cursor-pointer">
-              Notifications
-            </li>
-            <li className="py-2 px-6 hover:bg-gray-200 cursor-pointer">
-              Logout
+            <li
+              className="py-2 px-6 hover:bg-gray-200 cursor-pointer"
+              onClick={() => navigate("/watchlist")}
+            >
+              Watchlist
             </li>
           </ul>
         </nav>

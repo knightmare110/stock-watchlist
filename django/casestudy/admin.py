@@ -7,3 +7,7 @@ Models registered with the Django admin will be accessible at http://localhost:8
 https://docs.djangoproject.com/en/4.2/ref/contrib/admin/
 """
 from django.contrib import admin
+from .models import Watchlist  # Make sure this is correctly imported
+
+# Register your models here
+admin.site.register(Watchlist)
