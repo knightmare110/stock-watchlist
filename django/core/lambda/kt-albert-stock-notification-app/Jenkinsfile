@@ -3,7 +3,7 @@ pipeline {
   environment {
     PIPELINE_USER_CREDENTIAL_ID = 'aws-kt-albert-lambda-pipeline'
     SAM_TEMPLATE = 'template.yaml'
-    MAIN_BRANCH = 'master'
+    MAIN_BRANCH = 'main'
     TESTING_STACK_NAME = 'kt-albert-stock-notification-app'
     TESTING_PIPELINE_EXECUTION_ROLE = 'arn:aws:iam::211125606024:role/aws-sam-cli-managed-kt-albert-PipelineExecutionRole-AAGPC05VD7dh'
     TESTING_CLOUDFORMATION_EXECUTION_ROLE = 'arn:aws:iam::211125606024:role/aws-sam-cli-managed-kt-al-CloudFormationExecutionRo-NObnuWzHfRsf'
