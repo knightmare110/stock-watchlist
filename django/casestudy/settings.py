@@ -169,12 +169,5 @@ CELERY_BROKER_URL = "redis://localhost:6379/0"
 CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 SNS_TOPIC_ARN = "KT_ALBERT_STOCK"
 
-CELERY_BEAT_SCHEDULE = {                         # Define the schedule here
-    'update-stock-prices-every-5-seconds': {
-        'task': 'core.celery.update_stock_prices',  # Full path to the Celery task
-        'schedule': 5.0,  # Run every 5 seconds
-    },
-},
-
 WEBSOCKET_URL = 'ws://0.0.0.0:8001'
 ASGI_APPLICATION = 'django_app.asgi.application'
