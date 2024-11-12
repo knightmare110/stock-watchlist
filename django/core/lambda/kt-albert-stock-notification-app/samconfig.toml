@@ -22,6 +22,10 @@ resolve_s3 = true
 
 [default.sync.parameters]
 watch = true
+template_file = "/Users/mac/Projects/Personal/albert_product_casestudy_8.29.24/django/core/lambda/kt-albert-stock-notification-app/template.yaml"
+s3_bucket = "aws-sam-cli-managed-kt-albe-artifactsloggingbucket-aebeivm59zkz"
+stack_name = "aws-sam-cli-managed-kt-albert-stock-notification-app-stage1-pipeline-resources"
+dependency_layer = false
 
 [default.local_start_api.parameters]
 warm_containers = "EAGER"
