@@ -7,6 +7,7 @@ import boto3
 import redis
 from celery import Celery
 from celery.schedules import crontab
+from datetime import timedelta
 from django.conf import settings
 from django.db.models import Count
 
@@ -16,15 +17,20 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
-    'update-stock-prices-every-minute': {
+    # 'update-stock-prices-every-minute': {
+    #     'task': 'core.celery.update_stock_prices',
+    #     'schedule': crontab(minute='*/1'),  # Run every minute
+    # },
+    'update-stock-prices-every-5-seconds': {
         'task': 'core.celery.update_stock_prices',
-        'schedule': crontab(minute='*/1'),  # Run every minute
+        'schedule': timedelta(seconds=5),  # Run every minute
     },
 }
 
 # Set up the SNS client and Redis client
 sns_client = boto3.client('sns', region_name='us-east-1')
 redis_client = redis.Redis(host=os.getenv('REDIS_HOST', 'localhost'), port=6379, db=0)
+# redis_client.flushdb()  # For the current database
 
 # Environment variables for SNS Topic ARN and API key
 SNS_TOPIC_ARN = os.getenv('SNS_TOPIC_ARN')
@@ -41,10 +47,15 @@ def update_stock_prices():
     cached_watchlist = redis_client.get(watchlist_key)
 
     if cached_watchlist:
+        print("Cached Watchlist", cached_watchlist)
         # Decode the cached watchlist from Redis
         user_watchlist = json.loads(cached_watchlist)
-        print("Fetched watchlist from Redis cache.")
+        # Ensure user_watchlist is a dictionary, even if Redis returned data in an unexpected format
+        if not isinstance(user_watchlist, dict):
+            print("User empty")
+            user_watchlist = {}
     else:
+        print("Non Cached Watchlist")
         # Fetch watchlist from the database
         watchlist_entries = Watchlist.objects.values("user_id", "ticker")
         user_watchlist = {}
@@ -61,12 +72,18 @@ def update_stock_prices():
         redis_client.setex(watchlist_key, 3600, json.dumps(user_watchlist))  # Cache for 1 hour
         print("Stored watchlist in Redis cache.")
 
-    # Flatten the tickers to avoid duplicates, as we need unique stock prices
-    unique_tickers = {ticker for tickers in user_watchlist.values() for ticker in tickers}
+    # Ensure user_watchlist is a dictionary before accessing .values()
+    if isinstance(user_watchlist, dict):
+        # Flatten the tickers to avoid duplicates, as we need unique stock prices
+        unique_tickers = {ticker for tickers in user_watchlist.values() for ticker in tickers}
+    else:
+        unique_tickers = set()  # Set unique_tickers to empty if user_watchlist isn't a dictionary
+
     if not unique_tickers:
         print("No tickers found in the watchlist.")
         return
 
+    # Continue with the rest of the logic
     # Convert unique_tickers set to a comma-separated list
     ticker_string = ",".join(unique_tickers)
 
@@ -93,7 +110,7 @@ def update_stock_prices():
             "stock_prices": stock_prices,
             "user_watchlist": user_watchlist
         })
-        
+
         # Publish the updated stock prices and user watchlist to SNS
         sns_client.publish(TopicArn=SNS_TOPIC_ARN, Message=sns_message)
         print("Published stock prices and watchlist to SNS.")

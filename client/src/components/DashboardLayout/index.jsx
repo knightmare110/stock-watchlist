@@ -33,7 +33,7 @@ const DashboardLayout = ({ children }) => {
       <div className="flex-1 flex flex-col">
         {/* Header */}
         <header className="flex items-center justify-between bg-white p-4 shadow">
-          <div className="text-lg font-semibold text-gray-700">Dashboard</div>
+          <div className="text-lg font-semibold text-gray-700">Albert</div>
           <div className="flex items-center">
             <div className="mr-4">Hello, User</div>
             <img

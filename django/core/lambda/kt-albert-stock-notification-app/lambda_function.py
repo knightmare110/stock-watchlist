@@ -5,8 +5,15 @@ from urllib.parse import urlparse
 
 def lambda_handler(event, context):
     # Define AppSync API endpoint and API key
-    api_url = "https://byknpead3jdqvdgcw6vsvgc6um.appsync-api.us-east-1.amazonaws.com/graphql"
-    api_key = "da2-tstrgruhtfhynhssgtj5ljbhe4"
+    api_url = os.environ.get("API_URL")
+    api_key = os.environ.get("API_KEY")
+
+    if not api_url or not api_key:
+        print("API_URL or API_KEY are not found")
+        return {
+            "statusCode": 500,
+            "body": json.dumps("Environment variables must be set")
+        }
     
     # Check if 'Records' exists in the event
     if 'Records' not in event:
