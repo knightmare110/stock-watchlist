@@ -3,37 +3,62 @@ import React, { useEffect, useState } from 'react';
 import { generateClient } from 'aws-amplify/api';
 import axios from 'axios';
 import { subscribe } from '../../graphql/subscriptions';
-// Generate an AppSync client instance
+import HighchartsReact from 'highcharts-react-official';
+import Highcharts from 'highcharts/highstock';
+import DashboardLayout from '../../components/DashboardLayout';
+import LogHistory from '../../components/LogHistory';
+
 const client = generateClient();
 
 const WatchlistPage = () => {
   const [stockData, setStockData] = useState([]);
   const [watchlist, setWatchlist] = useState([]);
-  const username = localStorage.getItem('username'); // Assumes username is stored in local storage
-  const token = localStorage.getItem('token'); // Assumes token is stored in local storage
+  const [logData, setLogData] = useState([]);
+  const [barChartData, setBarChartData] = useState({});
+  const userid = localStorage.getItem('userid');
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
-    // Subscribe to real-time stock updates
-    console.log('t', client, subscribe)
     const observable = client.graphql({
       query: subscribe,
-      variables: { name: `user_6_channel` },
+      variables: { name: `user_${userid}_channel` },
     }).subscribe({
       next: ({ data }) => {
-        console.log('ttt', data);
         if (data?.subscribe) {
           const stockUpdates = JSON.parse(data.subscribe.data);
-          setStockData((prevData) => [...prevData, stockUpdates]);
+
+          const timestamp = new Date().getTime();
+          const stockName = Object.keys(stockUpdates)[0];
+          const closePrice = parseFloat(Object.values(stockUpdates)[0]);
+
+          const newPoint = [
+            timestamp,
+            closePrice + (Math.random() * 20),
+            closePrice + (Math.random() * 10),
+            closePrice - (Math.random() * 10),
+            closePrice - (Math.random() * 20)
+          ];
+
+          setStockData((prevData) => [...prevData, newPoint]);
+
+          // Update bar chart data
+          setBarChartData((prevData) => ({
+            ...prevData,
+            [stockName]: closePrice
+          }));
+
+          setLogData((prevLogs) => [
+            { timestamp: new Date(), update: stockUpdates },
+            ...prevLogs,
+          ]);
         }
       },
       error: (error) => console.error('Subscription error:', error),
     });
 
-    // Clean up the subscription on component unmount
     return () => observable.unsubscribe();
-  }, [username]);
+  }, [userid]);
 
-  // Fetch watchlist data from backend
   useEffect(() => {
     const fetchWatchlist = async () => {
       if (!token) {
@@ -41,7 +66,7 @@ const WatchlistPage = () => {
         return;
       }
       try {
-        const response = await axios.get(`http://localhost:8000/api/watchlist/${username}/`, {
+        const response = await axios.get(`http://localhost:8000/api/watchlist/${userid}/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -52,48 +77,117 @@ const WatchlistPage = () => {
       }
     };
     fetchWatchlist();
-  }, [username, token]);
+  }, [userid, token]);
+
+  // Highcharts options for the candlestick chart
+  const candlestickOptions = {
+    title: {
+      text: 'Real-Time Stock Prices'
+    },
+    rangeSelector: {
+      enabled: true,
+      inputEnabled: false,
+      buttons: [
+        { type: 'minute', count: 10, text: '10m' },
+        { type: 'hour', count: 1, text: '1h' },
+        { type: 'all', text: 'All' }
+      ]
+    },
+    xAxis: {
+      type: 'datetime'
+    },
+    yAxis: {
+      title: {
+        text: 'Price'
+      }
+    },
+    series: [
+      {
+        type: 'candlestick',
+        name: 'Stock Price',
+        data: stockData,
+        color: '#FF7F7F',
+        upColor: '#90EE90',
+        lastPrice: {
+          enabled: true,
+          label: {
+            enabled: true,
+            backgroundColor: '#FF7F7F'
+          }
+        },
+        tooltip: {
+          valueDecimals: 2
+        }
+      }
+    ]
+  };
+
+  // Highcharts options for the bar chart
+  const barChartOptions = {
+    chart: {
+      type: 'bar'
+    },
+    title: {
+      text: 'Real-Time Stock Prices by Stock Name'
+    },
+    xAxis: {
+      categories: Object.keys(barChartData),
+      title: {
+        text: 'Stock Name'
+      }
+    },
+    yAxis: {
+      min: 0,
+      title: {
+        text: 'Price'
+      }
+    },
+    series: [
+      {
+        name: 'Price',
+        data: Object.values(barChartData),
+        color: '#4285F4'
+      }
+    ]
+  };
 
   return (
-    <div>
+    <DashboardLayout>
       <h2 className="text-2xl font-semibold mb-6">Your Watchlist</h2>
-      {watchlist.length > 0 ? (
-        <table className="min-w-full bg-white shadow-md rounded">
-          <thead>
-            <tr>
-              <th className="py-2 px-4 border-b">Ticker</th>
-              <th className="py-2 px-4 border-b">Name</th>
-            </tr>
-          </thead>
-          <tbody>
-            {watchlist.map((stock) => (
-              <tr key={stock.ticker}>
-                <td className="py-2 px-4 border-b">{stock.ticker}</td>
-                <td className="py-2 px-4 border-b">{stock.name}</td>
+      <div className='flex gap-5'>
+        {watchlist.length > 0 ? (
+          <table className="bg-white shadow-md rounded w-[32rem]">
+            <thead>
+              <tr>
+                <th className="py-2 px-4 border-b">Ticker</th>
+                <th className="py-2 px-4 border-b">Name</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <p>No items in your watchlist</p>
-      )}
-      <div className="mt-6">
-        <h3 className="text-xl font-semibold mb-4">Real-Time Stock Updates</h3>
-        {stockData.length > 0 ? (
-          stockData.map((update, index) => (
-            <div key={index} className="mb-2">
-              {Object.entries(update).map(([ticker, price]) => (
-                <div key={ticker}>
-                  <strong>{ticker}</strong>: ${price}
-                </div>
+            </thead>
+            <tbody>
+              {watchlist.map((stock) => (
+                <tr key={stock.ticker}>
+                  <td className="py-2 px-4 border-b">{stock.ticker}</td>
+                  <td className="py-2 px-4 border-b">{stock.name}</td>
+                </tr>
               ))}
-            </div>
-          ))
+            </tbody>
+          </table>
         ) : (
-          <p>No updates yet</p>
+          <p>No items in your watchlist</p>
         )}
+        <LogHistory logs={logData} />
       </div>
-    </div>
+
+      <div className="mt-8">
+        <h3 className="text-xl font-semibold mb-4">Real-Time Candlestick Chart</h3>
+        <HighchartsReact highcharts={Highcharts} constructorType={'stockChart'} options={candlestickOptions} />
+      </div>
+
+      <div className="mt-8">
+        <h3 className="text-xl font-semibold mb-4">Real-Time Bar Chart of Stock Prices</h3>
+        <HighchartsReact highcharts={Highcharts} options={barChartOptions} />
+      </div>
+    </DashboardLayout>
   );
 };
 

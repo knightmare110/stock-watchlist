@@ -36,5 +36,5 @@ urlpatterns = [
     path("api/stocks/", StockSearchView.as_view(), name="stock-search"),
     path("api/auth/check/", CheckAuthView.as_view(), name="check-auth"),
     path('api/watchlist/', AddToWatchlistView.as_view(), name='add-to-watchlist'),
-    path('api/watchlist/<str:username>/', AddToWatchlistView.as_view(), name='user-watchlist'),  # New URL pattern for user-specific watchlist
+    path('api/watchlist/<int:userid>/', AddToWatchlistView.as_view(), name='user-watchlist'),
 ]
