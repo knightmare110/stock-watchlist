@@ -1,12 +1,13 @@
 import json
 import boto3
+import os
 import http.client
 from urllib.parse import urlparse
 
 def lambda_handler(event, context):
     # Define AppSync API endpoint and API key
-    api_url = os.environ.get("API_URL")
-    api_key = os.environ.get("API_KEY")
+    api_url = os.environ["API_URL"]
+    api_key = os.environ["API_KEY"]
 
     if not api_url or not api_key:
         print("API_URL or API_KEY are not found")
