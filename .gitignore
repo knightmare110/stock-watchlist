@@ -52,7 +52,6 @@ client/.pnp.js
 # Docker
 *.container
 .dockerignore
-docker-compose*.yml
 
 # IDE and Text Editor Configs
 .idea/
