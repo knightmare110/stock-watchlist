@@ -1,0 +1,101 @@
+version: '3'
+services:
+  # Django web server
+  web:
+    build:
+      context: ./django
+      dockerfile: Dockerfile
+    image: web:local
+    hostname: web
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./django:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_HOST=${REDIS_HOST}
+      - DATABASE_HOST=${DATABASE_HOST}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - db
+      - redis
+      - celery_worker
+      - celery_beat
+  # Postgres
+  db:
+    image: postgres:15-alpine3.18
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+
+  # Redis
+  redis:
+    image: redis:7-alpine3.18
+    hostname: redis
+
+  # Celery Worker
+  celery_worker:
+    build:
+      context: ./django
+      dockerfile: Dockerfile
+    command: celery -A core worker --loglevel=info
+    environment:
+      - DJANGO_SETTINGS_MODULE=casestudy.settings
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - ALBERT_CASE_STUDY_API_KEY=${ALBERT_CASE_STUDY_API_KEY}
+      - REDIS_HOST=redis
+      - SNS_TOPIC_ARN=${SNS_TOPIC_ARN}
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    volumes:
+      - ./django:/app
+    depends_on:
+      - redis
+      - db
+
+  # Celery Beat (for periodic tasks)
+  celery_beat:
+    build:
+      context: ./django
+      dockerfile: Dockerfile
+    command: celery -A core beat --loglevel=info
+    environment:
+      - DJANGO_SETTINGS_MODULE=casestudy.settings
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - ALBERT_CASE_STUDY_API_KEY=${ALBERT_CASE_STUDY_API_KEY}
+      - REDIS_HOST=redis
+      - SNS_TOPIC_ARN=${SNS_TOPIC_ARN}
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    volumes:
+      - ./django:/app
+    depends_on:
+      - redis
+      - db
+      - celery_worker
+
+  # React app
+  app:
+    image: app:local
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    volumes:
+      - ./client:/app/
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:

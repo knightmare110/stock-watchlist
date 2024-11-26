@@ -31,6 +31,7 @@ const WatchlistPage = () => {
           const timestamp = new Date().getTime();
 
           const updatedStockData = { ...stockData };
+          const barStockData = {};
 
           Object.entries(stockUpdates).forEach(([stockName, closePrice]) => {
             const newPoint = [
@@ -46,13 +47,10 @@ const WatchlistPage = () => {
               updatedStockData[stockName] = [];
             }
             updatedStockData[stockName] = [...updatedStockData[stockName], newPoint];
-
-            // Update bar chart data
-            setBarChartData((prevData) => ({
-              ...prevData,
-              [stockName]: closePrice,
-            }));
+            barStockData[stockName] = closePrice + Math.random() * 20
           });
+          // Update bar chart data
+          setBarChartData(barStockData);
 
           setStockData(updatedStockData);
 
